@@ -2,11 +2,21 @@
 
 心理学アプローチのポモドーロ・タイマー。オフライン対応の PWA として動作し、ローカルにセッション履歴を記録します。
 
-- フレームワーク: Next.js 15, React 19, TypeScript
-- 状態管理: Zustand
-- ストレージ: IndexedDB（Dexie）
-
 英語版の概要は末尾を参照してください（English summary below）
+
+## このリポジトリについて
+
+**注**: これは一時的なショーケース用に作成されたサンプル/デモ版です。
+
+### デモ目的のみ
+このリポジトリは、デモと学習を目的としています。
+
+### 技術スタック
+- Next.js 15
+- TypeScript
+- Tailwind CSS
+- IndexedDB (Dexie.js)
+- PWA サポート
 
 ---
 
@@ -123,6 +133,14 @@ src/
 ---
 
 ## English (Short Summary)
+
+### About This Repository
+This is a demonstration sample of a PWA Pomodoro Timer application.
+
+**Note**: This is a sample/demo version created for temporary showcase purposes.
+
+### Demo Purpose Only
+This repository is intended for demonstration and learning purposes.
 
 Tomatine is a psychology-based Pomodoro timer (Next.js 15 + React 19). It stores sessions locally via Dexie/IndexedDB. The circular timer shows remaining time in mm:ss with the mode and status inside the circle. The DailyTimeGraph renders today’s sessions on a 24h scale, overlays a vertical "now" line and the current mood icon, and uses green for completed sessions in the legend.
 
