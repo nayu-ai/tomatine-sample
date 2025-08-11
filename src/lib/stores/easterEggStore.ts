@@ -11,10 +11,25 @@ const inMemoryStorage = (): StateStorage => ({
 });
 
 // ガード付きストレージプロバイダ（ブラウザでは localStorage、SSR ではメモリ）
-const guardedStorageProvider = (): StateStorage =>
-  typeof window !== 'undefined' && window?.localStorage
-    ? window.localStorage
-    : inMemoryStorage();
+const guardedStorageProvider = (): StateStorage => {
+  if (typeof window === 'undefined') {
+    return inMemoryStorage();
+  }
+
+  try {
+    // localStorage の可用性をテスト（プライベートブラウジングモード対応）
+    const testKey = '__storage_test__';
+    window.localStorage.setItem(testKey, 'test');
+    window.localStorage.removeItem(testKey);
+    return window.localStorage;
+  } catch (error) {
+    console.warn(
+      'localStorage not available, falling back to memory storage:',
+      error
+    );
+    return inMemoryStorage();
+  }
+};
 
 // 絵文字タイプのユニオン型を定義（型安全かつ網羅性の担保）
 export type EmojiType =

@@ -1,6 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { SafeNotificationManager } from '@/lib/notification-utils';
+import type { SafeNotificationPermission } from '@/types/globals';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -213,7 +215,7 @@ export function usePWANotifications() {
 
   const showNotification = async (
     title: string,
-    options?: NotificationOptions
+    options?: any
   ): Promise<boolean> => {
     if (!isSupported || permission !== 'granted') {
       return false;

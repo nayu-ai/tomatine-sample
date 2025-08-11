@@ -145,3 +145,11 @@ This repository is intended for demonstration and learning purposes.
 Tomatine is a psychology-based Pomodoro timer (Next.js 15 + React 19). It stores sessions locally via Dexie/IndexedDB. The circular timer shows remaining time in mm:ss with the mode and status inside the circle. The DailyTimeGraph renders today’s sessions on a 24h scale, overlays a vertical "now" line and the current mood icon, and uses green for completed sessions in the legend.
 
 Session lifecycle: a record is created on warmup start or focus start (when skipping warmup). On completion, `completed`, `endAt`, and `actualFocusMs` are saved. If the current mood differs from the start mood, `moodEnd` is stored. Stop only resets timer state (the session remains incomplete).
+
+---
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+Copyright (c) 2025 Souma Nayu

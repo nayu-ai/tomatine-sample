@@ -6,6 +6,10 @@
 import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
 import type { ToastMessage } from '../types';
+import {
+  SafeNotificationManager,
+  getNotificationPermission,
+} from '../notification-utils';
 import { generateId } from '../utils';
 
 export interface UIStore {
@@ -64,7 +68,7 @@ export interface UIStore {
 
   // Actions - Notification handling
   requestNotificationPermission: () => Promise<boolean>;
-  showNotification: (title: string, options?: NotificationOptions) => void;
+  showNotification: (title: string, options?: any) => void;
   setCanRequestNotification: (canRequest: boolean) => void;
 
   // Actions - Device detection
@@ -96,8 +100,7 @@ export const useUIStore = create<UIStore>()(
 
     currentPage: 'timer',
 
-    notificationPermission:
-      typeof window !== 'undefined' ? Notification.permission : 'default',
+    notificationPermission: getNotificationPermission(),
     canRequestNotification: false,
 
     isTouchDevice: false,
@@ -198,49 +201,25 @@ export const useUIStore = create<UIStore>()(
 
     // Notification handling
     requestNotificationPermission: async () => {
-      if (typeof window === 'undefined' || !('Notification' in window)) {
-        return false;
-      }
-
-      if (Notification.permission === 'granted') {
-        return true;
-      }
-
-      if (Notification.permission === 'denied') {
-        return false;
-      }
-
-      try {
-        const permission = await Notification.requestPermission();
-        set({ notificationPermission: permission });
-        return permission === 'granted';
-      } catch {
-        set({ notificationPermission: 'denied' });
-        return false;
-      }
+      const manager = new SafeNotificationManager();
+      const permission = await manager.requestPermission();
+      set({ notificationPermission: permission });
+      return permission === 'granted';
     },
 
     showNotification: (title, options = {}) => {
-      if (typeof window === 'undefined' || !('Notification' in window)) {
-        // Fallback to toast notification
+      const manager = new SafeNotificationManager();
+
+      if (manager.canShow()) {
+        manager.show(title, options).then(success => {
+          if (!success) {
+            // Fallback to toast if notification fails
+            get().showInfoToast(title);
+          }
+        });
+      } else {
+        // Fallback to toast when notifications are not available
         get().showInfoToast(title);
-        return;
-      }
-
-      if (Notification.permission === 'granted') {
-        try {
-          const notification = new Notification(title, options);
-
-          // Auto-close after 5 seconds
-          setTimeout(() => {
-            notification.close();
-          }, 5000);
-
-          return notification;
-        } catch {
-          // 通知の表示に失敗した場合は何もしない
-          return null;
-        }
       }
     },
 
@@ -346,8 +325,5 @@ if (typeof window !== 'undefined') {
   });
 
   // Check notification permission on load
-  if ('Notification' in window) {
-    // Update notification permission directly
-    store.notificationPermission = Notification.permission;
-  }
+  store.notificationPermission = getNotificationPermission();
 }

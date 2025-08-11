@@ -71,8 +71,18 @@ export class TeoTimerDB extends Dexie {
   }
 }
 
-// Create database instance only on client side
-export const db = typeof window !== 'undefined' ? new TeoTimerDB() : null;
+// Create database instance only on client side with error handling
+export const db =
+  typeof window !== 'undefined'
+    ? (() => {
+        try {
+          return new TeoTimerDB();
+        } catch (error) {
+          console.warn('Failed to initialize IndexedDB:', error);
+          return null;
+        }
+      })()
+    : null;
 
 /**
  * Database service class providing high-level data operations
@@ -86,7 +96,9 @@ export class DatabaseService {
 
   private ensureClientSide(): TeoTimerDB {
     if (!this.db) {
-      throw new Error('Database not available on server side');
+      throw new Error(
+        'Database not available - please check if IndexedDB is supported and not in private browsing mode'
+      );
     }
     return this.db;
   }
@@ -388,7 +400,8 @@ export const databaseService = new DatabaseService();
 
 // Initialize database on first import (client-side only)
 if (typeof window !== 'undefined' && db) {
-  db.open().catch(() => {
-    // データベースオープン失敗
+  db.open().catch(error => {
+    console.warn('Failed to open IndexedDB:', error);
+    // ユーザーに通知する可能性もあるが、現在は警告のみ
   });
 }

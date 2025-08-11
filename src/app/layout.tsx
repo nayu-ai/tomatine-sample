@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 import './globals.css';
 
 const geistSans = Geist({
@@ -105,20 +106,23 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <ErrorBoundary>{children}</ErrorBoundary>
         <script
           dangerouslySetInnerHTML={{
             __html: `
               if ('serviceWorker' in navigator && '${process.env.NODE_ENV}' === 'production') {
                 window.addEventListener('load', function() {
-                  // 本番のみ Service Worker を登録
-                  navigator.serviceWorker.register('/sw.js')
-                    .then(function(registration) {
-                      console.log('SW registered: ', registration);
-                    })
-                    .catch(function(registrationError) {
-                      console.log('SW registration failed: ', registrationError);
-                    });
+                  try {
+                    navigator.serviceWorker.register('/sw.js')
+                      .then(function(registration) {
+                        console.log('SW registered: ', registration);
+                      })
+                      .catch(function(registrationError) {
+                        console.warn('SW registration failed: ', registrationError);
+                      });
+                  } catch (error) {
+                    console.warn('SW registration error: ', error);
+                  }
                 });
               }
             `,
