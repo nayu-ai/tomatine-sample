@@ -1,0 +1,59 @@
+{
+  "name": "Tomatine - 心理学アプローチ・ポモドーロタイマー",
+  "short_name": "Tomatine",
+  "description": "心理学に基づく3分ウォームアップ機能付きのポモドーロタイマー。オフライン対応で集中力を最大化。",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#3b82f6",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "ja",
+  "categories": ["productivity", "utilities", "lifestyle"],
+  "icons": [
+    {
+      "src": "/next.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/vercel.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "ウォームアップ開始",
+      "short_name": "ウォームアップ",
+      "description": "3分のウォームアップから開始",
+      "url": "/?warmup=true",
+      "icons": [
+        {
+          "src": "/next.svg",
+          "sizes": "any",
+          "type": "image/svg+xml"
+        }
+      ]
+    },
+    {
+      "name": "直接集中開始",
+      "short_name": "集中開始",
+      "description": "ウォームアップをスキップして集中時間を開始",
+      "url": "/?direct=true",
+      "icons": [
+        {
+          "src": "/next.svg",
+          "sizes": "any",
+          "type": "image/svg+xml"
+        }
+      ]
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false,
+  "features": ["Cross Platform", "fast", "simple"],
+  "dir": "ltr"
+}
