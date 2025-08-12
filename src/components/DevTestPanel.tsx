@@ -11,10 +11,14 @@ const calculateConcentrationRate = (
     completed?: boolean;
     actualFocusMs?: number;
     moodStart?: string;
+    moodEnd?: string;
   }>
 ) => {
   const completedSessions = sessions.filter(
-    session => session.completed && session.actualFocusMs && session.moodStart
+    session =>
+      session.completed &&
+      session.actualFocusMs &&
+      (session.moodStart || session.moodEnd)
   );
 
   if (completedSessions.length === 0) return 50;
@@ -24,7 +28,9 @@ const calculateConcentrationRate = (
 
   completedSessions.forEach(session => {
     const focusHours = (session.actualFocusMs || 0) / (1000 * 60 * 60); // 時間単位
-    const moodScore = getMoodScore(session.moodStart || '');
+    // moodEnd優先、なければmoodStartを使用
+    const mood = session.moodEnd || session.moodStart || '';
+    const moodScore = getMoodScore(mood);
 
     totalWeightedTime += focusHours * moodScore;
     totalCompletedTime += focusHours;
@@ -308,11 +314,25 @@ export const DevTestPanel: React.FC = () => {
     }
   };
 
-  const testTimerStart = () => {
+  const testTimerStart = async () => {
     try {
-      setFocusDuration(10000); // 10秒テスト
+      setFocusDuration(60000); // 1分テスト（最小値）
+      // 設定が反映されるのを少し待つ
+      await new Promise(resolve => setTimeout(resolve, 50));
+      await startFocus(true); // Skip warmup
+      showInfoToast('1分テストタイマー開始');
+    } catch (error) {
+      console.error('タイマー開始エラー:', error);
+      showErrorToast('タイマーの開始に失敗しました');
+      setErrorMessage('タイマーの起動に失敗しました');
+    }
+  };
+
+  const testTimerStart5s = () => {
+    try {
+      setFocusDuration(5000); // 5秒テスト（超短縮）
       startFocus(true); // Skip warmup
-      showInfoToast('10秒テストタイマー開始');
+      showInfoToast('5秒テストタイマー開始');
     } catch (error) {
       console.error('タイマー開始エラー:', error);
       showErrorToast('タイマーの開始に失敗しました');
@@ -514,7 +534,7 @@ export const DevTestPanel: React.FC = () => {
             className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={timerIsRunning || isLoading}
           >
-            10秒タイマーテスト
+            1分タイマーテスト
           </button>
           <button
             onClick={() => showSuccessToast('テスト通知')}

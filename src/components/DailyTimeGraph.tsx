@@ -38,17 +38,22 @@ const moodColors: Record<Mood, string> = {
 // 集中度計算のためのユーティリティ関数
 const calculateConcentrationRate = (sessions: Session[]): number => {
   const completedSessions = sessions.filter(
-    session => session.completed && session.actualFocusMs && session.moodStart
+    session =>
+      session.completed &&
+      session.actualFocusMs &&
+      (session.moodStart || session.moodEnd)
   );
 
-  if (completedSessions.length === 0) return 0;
+  if (completedSessions.length === 0) return 50;
 
   let totalWeightedTime = 0;
   let totalCompletedTime = 0;
 
   completedSessions.forEach(session => {
     const focusHours = (session.actualFocusMs || 0) / (1000 * 60 * 60); // 時間単位
-    const moodScore = getMoodScore(session.moodStart || '');
+    // moodEnd優先、なければmoodStartを使用
+    const mood = session.moodEnd || session.moodStart || '';
+    const moodScore = getMoodScore(mood);
 
     totalWeightedTime += focusHours * moodScore;
     totalCompletedTime += focusHours;
